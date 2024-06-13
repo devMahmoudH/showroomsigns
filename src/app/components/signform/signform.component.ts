@@ -13,12 +13,13 @@ export class SignformComponent implements OnInit {
   constructor(private fb: FormBuilder) {
     this.signForm = this.fb.group(
       {
-        businessTitle: ['', Validators.required],
+        businessTitle: [''],
         itemTitle: ['', Validators.required],
         sku: ['', Validators.required],
         price: ['', [Validators.required, Validators.min(0)]],
         discountedPrice: ['', [Validators.required, Validators.min(0)]],
         logo: [null],
+        productImage: [null], // New field for product image
       },
       { validators: this.priceValidator() }
     );
@@ -28,10 +29,10 @@ export class SignformComponent implements OnInit {
     // Perform any setup or initialization tasks here
   }
 
-  onFileChange(event: any) {
+  onFileChange(event: any, controlName: string) {
     const file = event.target.files[0];
     this.signForm.patchValue({
-      logo: file,
+      [controlName]: file,
     });
   }
 
@@ -40,21 +41,53 @@ export class SignformComponent implements OnInit {
       const formData = this.signForm.value;
       const doc = new jsPDF();
 
-      doc.text(formData.businessTitle, 10, 10);
+      if (formData.businessTitle) {
+        doc.text(formData.businessTitle, 10, 10);
+      }
+      doc.setFont('helvetica', 'bold');
       doc.text(formData.itemTitle, 10, 20);
-      doc.text(`SKU: ${formData.sku}`, 10, 30);
-      doc.text(`Price: ${formData.price}`, 10, 40);
-      doc.text(`Discounted Price: ${formData.discountedPrice}`, 10, 50);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`#: ${formData.sku}`, 10, 30);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`$${formData.price}`, 10, 40);
+      doc.text(`Now: $${formData.discountedPrice}`, 10, 50);
+
+      const addImageToPDF = (
+        imgData: any,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        callback: () => void
+      ) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(imgData);
+        img.onload = () => {
+          doc.addImage(img, 'PNG', x, y, width, height);
+          callback();
+        };
+      };
 
       if (formData.logo) {
-        const img = new Image();
-        img.src = URL.createObjectURL(formData.logo);
-        img.onload = () => {
-          doc.addImage(img, 'PNG', 10, 60, 50, 50);
-          doc.save('sign.pdf');
-        };
+        addImageToPDF(formData.logo, 10, 60, 50, 50, () => {
+          if (formData.productImage) {
+            addImageToPDF(formData.productImage, 70, 60, 100, 100, () => {
+              doc.autoPrint(); // This will directly print the PDF
+              window.open(doc.output('bloburl'), '_blank');
+            });
+          } else {
+            doc.autoPrint(); // This will directly print the PDF
+            window.open(doc.output('bloburl'), '_blank');
+          }
+        });
+      } else if (formData.productImage) {
+        addImageToPDF(formData.productImage, 70, 60, 100, 100, () => {
+          doc.autoPrint(); // This will directly print the PDF
+          window.open(doc.output('bloburl'), '_blank');
+        });
       } else {
-        doc.save('sign.pdf');
+        doc.autoPrint(); // This will directly print the PDF
+        window.open(doc.output('bloburl'), '_blank');
       }
     }
   }

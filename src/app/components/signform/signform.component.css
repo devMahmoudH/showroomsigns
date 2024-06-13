@@ -2,6 +2,29 @@
   margin-bottom: 20px;
 }
 
+.input-group {
+  display: flex;
+  align-items: center;
+}
+
+.input-group-text {
+  padding: 10px;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-right: none;
+  border-radius: 5px 0 0 5px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  border-left: none;
+}
+
 .error-message {
   color: red;
   font-size: 0.9em;
