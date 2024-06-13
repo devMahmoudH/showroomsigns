@@ -1,0 +1,10 @@
+<div>
+  <h1>{{ formData.businessTitle }}</h1>
+  <h2>{{ formData.itemTitle }}</h2>
+  <p>SKU: {{ formData.sku }}</p>
+  <p>Price: {{ formData.price }}</p>
+  <p>Discounted Price: {{ formData.discountedPrice }}</p>
+  <div *ngIf="formData.logo">
+    <img [src]="formData.logo | safeUrl" alt="Logo Preview" width="100" />
+  </div>
+</div>

@@ -1,0 +1,105 @@
+<form [formGroup]="signForm" (ngSubmit)="generatePDF()">
+  <div>
+    <label for="businessTitle">Business Name</label>
+    <input
+      id="businessTitle"
+      formControlName="businessTitle"
+      placeholder="Business Title"
+    />
+    <div
+      *ngIf="
+        signForm.get('businessTitle')?.invalid &&
+        signForm.get('businessTitle')?.touched
+      "
+    >
+      Business Title is required
+    </div>
+  </div>
+
+  <div>
+    <label for="itemTitle">Item Title</label>
+    <input
+      id="itemTitle"
+      formControlName="itemTitle"
+      placeholder="Item Title"
+    />
+    <div
+      *ngIf="
+        signForm.get('itemTitle')?.invalid && signForm.get('itemTitle')?.touched
+      "
+    >
+      Item Title is required
+    </div>
+  </div>
+
+  <div>
+    <label for="sku">Item Number or SKU</label>
+    <input id="sku" formControlName="sku" placeholder="Item Number (SKU)" />
+    <div *ngIf="signForm.get('sku')?.invalid && signForm.get('sku')?.touched">
+      SKU is required
+    </div>
+  </div>
+
+  <div>
+    <label for="price">Price</label>
+    <input
+      id="price"
+      formControlName="price"
+      placeholder="Price"
+      type="number"
+    />
+    <div
+      *ngIf="signForm.get('price')?.invalid && signForm.get('price')?.touched"
+    >
+      <div *ngIf="signForm.get('price')?.errors?.['required']">
+        Price is required
+      </div>
+      <div *ngIf="signForm.get('price')?.errors?.['min']">
+        Price must be a positive number
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <label for="discountedPrice">Discounted Price</label>
+    <input
+      id="discountedPrice"
+      formControlName="discountedPrice"
+      placeholder="Discounted Price"
+      type="number"
+    />
+    <div
+      *ngIf="
+        signForm.get('discountedPrice')?.invalid &&
+        signForm.get('discountedPrice')?.touched
+      "
+    >
+      <div *ngIf="signForm.get('discountedPrice')?.errors?.['required']">
+        Discounted Price is required
+      </div>
+      <div *ngIf="signForm.get('discountedPrice')?.errors?.['min']">
+        Discounted Price must be a positive number
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="signForm.errors?.['priceInvalid']">
+    Discounted Price cannot be higher than the Price
+  </div>
+
+  <div>
+    <label for="logo">Logo</label>
+    <input id="logo" type="file" (change)="onFileChange($event)" />
+    <div *ngIf="signForm.get('logo')?.value">
+      <img
+        [src]="signForm.get('logo')?.value | safeUrl"
+        alt="Logo Preview"
+        width="100"
+      />
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="signForm.invalid">Generate Sign</button>
+</form>
+
+<app-signpreview [formData]="signForm.value"></app-signpreview>
